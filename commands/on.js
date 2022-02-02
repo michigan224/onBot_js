@@ -8,9 +8,9 @@ module.exports = {
 	async execute(interaction) {
 		const embed = new MessageEmbed()
 			.setColor('#0099ff')
-			.setTitle('Roulette')
+			.setTitle('Who\'s on?')
 			.setURL('https://discord.js.org/');
 
-		return interaction.reply({ embeds: [ embed ] });
+		return interaction.reply({ embeds: [embed] });
 	},
 };
