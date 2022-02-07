@@ -9,8 +9,8 @@ WORKDIR /app
 COPY ["package.json", "package-lock.json*", "./"]
 
 RUN npm install --production
+RUN node deploy-commands.js
 
 COPY . .
 
-RUN node deploy-commands.js
 CMD [ "node", "index.js" ]
