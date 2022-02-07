@@ -79,14 +79,17 @@ async function get_member_message(member) {
     const presence = member.presence;
     if (!presence || presence.status == 'offline') return;
     const resp = { name: member.nickname || member.user.username, value: '', inline: false };
+    let active = false;
     for (const activity of presence.activities.sort((a, b) => (a.color < b.color) ? 1 : -1)) {
         if (activity.type == 'PLAYING') {
+            active = true;
             resp['value'] += `Playing ${activity.name}`;
             if (activity.state) {
                 resp['value'] += ` (${activity.state})`;
             }
         }
         else if (activity.type == 'LISTENING') {
+            active = true;
             if (resp['value'] == member.nickname || member.user.username) {
                 resp['value'] += `Listening to ${activity.details}`;
             }
@@ -95,5 +98,6 @@ async function get_member_message(member) {
             }
         }
     }
+    if (!active) return;
     return resp;
 }
