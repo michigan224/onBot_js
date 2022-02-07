@@ -46,8 +46,7 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
     console.log(newPresence);
 });
 
-// client.login(process.env.DISCORD_TOKEN);
-client.login('ODI4Njc5NjgxMzgwNzEyNDQ4.YGtGGA.YkS4dP8DiGf3TxyO6ddF0YfNwXw');
+client.login(process.env.DISCORD_TOKEN);
 
 async function whosOn(message) {
     const members = message.channel.members;
