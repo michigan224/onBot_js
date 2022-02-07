@@ -78,17 +78,17 @@ async function whosOn(message) {
 async function get_member_message(member) {
     const presence = member.presence;
     if (!presence || presence.status == 'offline') return;
-    const resp = { name: member.nickname || member.user.username, value: member.nickname || member.user.username, inline: false };
+    const resp = { name: member.nickname || member.user.username, value: '', inline: false };
     for (const activity of presence.activities.sort((a, b) => (a.color < b.color) ? 1 : -1)) {
         if (activity.type == 'PLAYING') {
-            resp['value'] += ` is playing ${activity.name}`;
+            resp['value'] += `Playing ${activity.name}`;
             if (activity.state) {
                 resp['value'] += ` (${activity.state})`;
             }
         }
         else if (activity.type == 'LISTENING') {
             if (resp['value'] == member.nickname || member.user.username) {
-                resp['value'] += ` is listening to ${activity.details}`;
+                resp['value'] += `Listening to ${activity.details}`;
             }
             else {
                 resp['value'] += ` while listening to ${activity.details}`;
