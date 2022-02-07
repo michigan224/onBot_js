@@ -12,7 +12,7 @@ for (const file of commandFiles) {
 }
 
 client.once('ready', c => {
-    console.log(`Ready! Logged in as ${c.user.tag}`);
+    console.log(`${getDatetime()} ::: Ready! Logged in as ${c.user.tag}`);
     client.user.setActivity('you monkey brains', { type: 'LISTENING' });
 });
 
@@ -33,11 +33,11 @@ client.on('interactionCreate', async interaction => {
 });
 
 client.on('messageCreate', async message => {
-    console.log(message.cleanContent.toLowerCase());
+    console.log(`${getDatetime()} ::: ${message.cleanContent.toLowerCase()}`);
     const words = message.cleanContent.toLowerCase().match(/\w+(?:'\w+)*/g);
     console.log(words);
     if (words && (words.includes('whos') || words.includes('who\'s')) && words.includes('on')) {
-        console.log(`${message.author.username} asked who's on`);
+        console.log(`${getDatetime()} ::: ${message.author.username} asked who's on`);
         await whosOn(message);
     }
 });
@@ -57,8 +57,8 @@ async function whosOn(message) {
     let alone = true;
     for (const member of members.values()) {
         if (member.user.bot || member.user == message.author) continue;
-        console.log(`Getting status of ${member.user.username}`);
-        const resp = await get_member_message(member);
+        console.log(`${getDatetime()} ::: Getting status of ${member.user.username}`);
+        const resp = await getMemberMessage(member);
         if (resp) {
             alone = false;
             embed.addField(
@@ -75,7 +75,7 @@ async function whosOn(message) {
     return;
 }
 
-async function get_member_message(member) {
+async function getMemberMessage(member) {
     const presence = member.presence;
     if (!presence || presence.status == 'offline') return;
     const resp = { name: member.nickname || member.user.username, value: '', inline: false };
@@ -100,4 +100,12 @@ async function get_member_message(member) {
     }
     if (!active) return;
     return resp;
+}
+
+function getDatetime() {
+    const today = new Date();
+    const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    const time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+    const dateTime = date + ' ' + time;
+    return dateTime;
 }
