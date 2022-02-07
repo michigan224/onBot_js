@@ -36,7 +36,7 @@ client.on('messageCreate', async message => {
     console.log(`${getDatetime()} ::: ${message.cleanContent.toLowerCase()}`);
     const words = message.cleanContent.toLowerCase().match(/\w+(?:'\w+)*/g);
     console.log(words);
-    if (words && (words.includes('whos') || words.includes('who\'s')) && words.includes('on')) {
+    if (words && (words.includes('who') || words.includes('whos') || words.includes('who\'s')) && words.includes('on')) {
         console.log(`${getDatetime()} ::: ${message.author.username} asked who's on`);
         await whosOn(message);
     }
