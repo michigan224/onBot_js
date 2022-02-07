@@ -37,14 +37,15 @@ client.on('messageCreate', async message => {
     const words = message.cleanContent.toLowerCase().match(/\w+(?:'\w+)*/g);
     console.log(words);
     if ((words.includes('whos') || words.includes('who\'s')) && words.includes('on')) {
+        console.log(`${message.author.username} asked who's on`);
         await whosOn(message);
     }
 });
 
 client.on('presenceUpdate', (oldPresence, newPresence) => {
-    console.log(oldPresence);
-    console.log(newPresence);
+    return;
 });
+
 
 client.login(process.env.DISCORD_TOKEN);
 
@@ -54,17 +55,18 @@ async function whosOn(message) {
         .setColor('#0099ff')
         .setTitle('Who\'s on?');
     let alone = true;
-    for (const member in members) {
-        if (member.bot || member == message.author) continue;
+    for (const member of members.values()) {
+        if (member.user.bot || member.user == message.author) continue;
+        console.log(`Getting status of ${member.user.username}`);
         const resp = await get_member_message(member);
         if (resp) {
             alone = false;
-            embed.add_field(
+            embed.addField(
                 resp['name'], resp['value'], resp['inline']);
         }
     }
     if (alone) {
-        embed.add_field('RIP',
+        embed.addField('RIP',
             'Looks like no one is on. You\'re going to have to play alone.',
             false);
     }
@@ -74,6 +76,24 @@ async function whosOn(message) {
 }
 
 async function get_member_message(member) {
-    const presence = await member.fetchPresence();
-    return presence;
+    const presence = member.presence;
+    if (!presence || presence.status == 'offline') return;
+    const resp = { name: member.nickname || member.user.username, value: member.nickname || member.user.username, inline: false };
+    for (const activity of presence.activities.sort((a, b) => (a.color < b.color) ? 1 : -1)) {
+        if (activity.type == 'PLAYING') {
+            resp['value'] += ` is playing ${activity.name}`;
+            if (activity.state) {
+                resp['value'] += ` (${activity.state})`;
+            }
+        }
+        else if (activity.type == 'LISTENING') {
+            if (resp['value'] == member.nickname || member.user.username) {
+                resp['value'] += ` is listening to ${activity.details}`;
+            }
+            else {
+                resp['value'] += ` while listening to ${activity.details}`;
+            }
+        }
+    }
+    return resp;
 }
