@@ -47,8 +47,7 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
     return;
 });
 
-client.login('ODI4Njc5NjgxMzgwNzEyNDQ4.YGtGGA.5h3EZcdFwbvoAxWiFLGEYfkqXn4');
-// client.login(process.env.DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN);
 
 async function whosOn(message) {
     const members = message.channel.members;
