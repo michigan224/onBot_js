@@ -33,6 +33,7 @@ client.on('interactionCreate', async interaction => {
 });
 
 client.on('messageCreate', async message => {
+    if (message.author.bot) return;
     console.log(`${getDatetime()} ::: ${message.cleanContent.toLowerCase()}`);
     const words = message.cleanContent.toLowerCase().match(/\w+(?:'\w+)*/g);
     console.log(words);
@@ -46,8 +47,8 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
     return;
 });
 
-
-client.login(process.env.DISCORD_TOKEN);
+client.login('ODI4Njc5NjgxMzgwNzEyNDQ4.YGtGGA.5h3EZcdFwbvoAxWiFLGEYfkqXn4');
+// client.login(process.env.DISCORD_TOKEN);
 
 async function whosOn(message) {
     const members = message.channel.members;
