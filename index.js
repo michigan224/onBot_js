@@ -36,7 +36,6 @@ client.on('messageCreate', async message => {
     if (message.author.bot) return;
     console.log(`${getDatetime()} ::: ${message.cleanContent.toLowerCase()}`);
     const words = message.cleanContent.toLowerCase().match(/\w+(?:'\w+)*/g);
-    console.log(words);
     if (words && (words.includes('who') || words.includes('whos') || words.includes('who\'s')) && words.includes('on')) {
         console.log(`${getDatetime()} ::: ${message.author.username} asked who's on`);
         await whosOn(message);
@@ -70,7 +69,9 @@ async function whosOn(message) {
             'Looks like no one is on. You\'re going to have to play alone.',
             false);
     }
+    console.log(`${getDatetime()} ::: Sending response message`);
     await message.channel.send({ embeds: [embed] });
+    console.log(`${getDatetime()} ::: Deleting request message`);
     await message.delete();
     return;
 }
@@ -99,6 +100,7 @@ async function getMemberMessage(member) {
         }
     }
     if (!active) return;
+    console.log(`${getDatetime()} ::: Got status ${resp}`);
     return resp;
 }
 
