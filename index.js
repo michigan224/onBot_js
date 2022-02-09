@@ -91,7 +91,7 @@ async function getMemberMessage(member) {
         }
         else if (activity.type == 'LISTENING') {
             active = true;
-            if (resp['value'] == member.nickname || member.user.username) {
+            if (resp['value'] === '') {
                 resp['value'] += `Listening to ${activity.details}`;
             }
             else {
