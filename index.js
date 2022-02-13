@@ -3,7 +3,7 @@ const { Client, Collection, Intents, MessageEmbed } = require('discord.js');
 const Tautulli = require('tautulli-api');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_PRESENCES] });
-const tautulli = new Tautulli('process.env.TAUTULLI_IP', 'process.env.TAUTULLI_PORT', 'process.env.TAUTULLI_API_KEY');
+const tautulli = new Tautulli(process.env.TAUTULLI_IP, process.env.TAUTULLI_PORT, process.env.TAUTULLI_API_KEY);
 
 client.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
