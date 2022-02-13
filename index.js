@@ -1,7 +1,9 @@
 const fs = require('fs');
 const { Client, Collection, Intents, MessageEmbed } = require('discord.js');
+const Tautulli = require('tautulli-api');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_PRESENCES] });
+const tautulli = new Tautulli('process.env.TAUTULLI_IP', 'process.env.TAUTULLI_PORT', 'process.env.TAUTULLI_API_KEY');
 
 client.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -34,7 +36,7 @@ client.on('interactionCreate', async interaction => {
 
 client.on('messageCreate', async message => {
     if (message.author.bot) return;
-    console.log(`${getDatetime()} ::: ${message.cleanContent.toLowerCase()}`);
+    console.log(`${getDatetime()} ::: ${message.author.username} said ${message.cleanContent.toLowerCase()}`);
     const words = message.cleanContent.toLowerCase().match(/\w+(?:'\w+)*/g);
     if (words && (words.includes('who') || words.includes('whos') || words.includes('who\'s')) && words.includes('on')) {
         console.log(`${getDatetime()} ::: ${message.author.username} asked who's on`);
@@ -54,10 +56,11 @@ async function whosOn(message) {
         .setColor('#0099ff')
         .setTitle('Who\'s on?');
     let alone = true;
+    const tautulliData = await getTautulliData();
     for (const member of members.values()) {
         if (member.user.bot || member.user == message.author) continue;
         console.log(`${getDatetime()} ::: Getting status of ${member.user.username}`);
-        const resp = await getMemberMessage(member);
+        const resp = await getMemberMessage(member, tautulliData);
         if (resp) {
             alone = false;
             embed.addField(
@@ -76,32 +79,58 @@ async function whosOn(message) {
     return;
 }
 
-async function getMemberMessage(member) {
+async function getMemberMessage(member, tautulliData) {
     const presence = member.presence;
-    if (!presence || presence.status == 'offline') return;
+    if (presence && presence.status == 'offline') return;
     const resp = { name: member.nickname || member.user.username, value: '', inline: false };
     let active = false;
-    for (const activity of presence.activities.sort((a, b) => (a.color < b.color) ? 1 : -1)) {
-        if (activity.type == 'PLAYING') {
-            active = true;
-            resp['value'] += `Playing ${activity.name}`;
-            if (activity.state) {
-                resp['value'] += ` (${activity.state})`;
+    if (presence) {
+        for (const activity of presence.activities.sort((a, b) => (a.color < b.color) ? 1 : -1)) {
+            if (activity.type == 'PLAYING') {
+                active = true;
+                resp['value'] += `Playing ${activity.name}`;
+                if (activity.state) {
+                    resp['value'] += ` (${activity.state})`;
+                }
+            }
+            else if (activity.type == 'LISTENING') {
+                active = true;
+                if (resp['value'] === '') {
+                    resp['value'] += `Listening to ${activity.details}`;
+                }
+                else {
+                    resp['value'] += ` while listening to ${activity.details}`;
+                }
             }
         }
-        else if (activity.type == 'LISTENING') {
-            active = true;
-            if (resp['value'] === '') {
-                resp['value'] += `Listening to ${activity.details}`;
-            }
-            else {
-                resp['value'] += ` while listening to ${activity.details}`;
-            }
+    }
+    const userMap = { 'Xander': 'Alex', 'Cam': 'Cam', 'Loom': 'Loom', 'Austin': 'Austin', 'David': 'michigan224', 'Chris': 'Chris' };
+    if (tautulliData.response.result !== 'success') return;
+    if (tautulliData.response.data.stream_count === 0) return;
+    const data = tautulliData.response.data;
+    for (const stream of data.sessions) {
+        let title = '';
+        if (userMap[resp['name']] !== stream.user) continue;
+        if (stream.library_name === 'TV Shows') {
+            title = `${stream.grandparent_title} - S${stream.parent_title.replace('Season ', '')}E${stream.media_index} - ${stream.title}`;
         }
+        else if (stream.library_name === 'Movies') {
+            title = `${stream.title}`;
+        }
+        if (title === '') break;
+        resp['value'] += `\nWatching ${title} on Plex`;
+        active = true;
     }
     if (!active) return;
     console.log(`${getDatetime()} ::: Got status ${resp}`);
     return resp;
+}
+
+async function getTautulliData() {
+    const data = await tautulli.get('get_activity').then(res => {
+        return res;
+    });
+    return data;
 }
 
 function getDatetime() {
