@@ -93,7 +93,12 @@ async function getMemberMessage(member, tautulliData) {
         for (const activity of presence.activities.sort((a, b) => (a.color < b.color) ? 1 : -1)) {
             if (activity.type == 'PLAYING') {
                 active = true;
-                resp['value'] += `Playing ${activity.name}`;
+                if (resp['value'] === '') {
+                    resp['value'] += `Playing ${activity.name}`;
+                }
+                else {
+                    resp['value'] += ` while playing ${activity.name}`;
+                }
                 if (activity.state) {
                     resp['value'] += ` (${activity.state})`;
                 }
