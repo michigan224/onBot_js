@@ -2,11 +2,13 @@ const fs = require('fs');
 const { Client, Collection, Intents, MessageEmbed } = require('discord.js');
 const Tautulli = require('tautulli-api');
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_PRESENCES] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS] });
 const tautulli = new Tautulli(process.env.TAUTULLI_IP, process.env.TAUTULLI_PORT, process.env.TAUTULLI_API_KEY);
 
 client.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+let lastTimeout = null;
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
@@ -41,6 +43,9 @@ client.on('messageCreate', async message => {
     if (words && (words.includes('who') || words.includes('whos') || words.includes('who\'s')) && words.includes('on')) {
         console.log(`${getDatetime()} ::: ${message.author.username} asked who's on`);
         await whosOn(message);
+    }
+    if (message.author.id === '629143455871795212') {
+        await handleCam(message);
     }
 });
 
@@ -131,6 +136,28 @@ async function getTautulliData() {
         return res;
     });
     return data;
+}
+
+async function handleCam(message) {
+    const words = message.cleanContent.toLowerCase().match(/\w+(?:'\w+)*/g);
+    if (!words.includes('sad')) return;
+    if (lastTimeout) {
+        const guildMember = message.member;
+        const seconds = Math.abs(lastTimeout - Date.now()) / 1000;
+        if (seconds < 1 * 60) {
+            guildMember.timeout(1 * 60 * 1000, 'Spamming chat')
+                .then(console.log(`${getDatetime()} ::: Timed out Cam for ${1 * 60 * 1000} seconds`))
+                .catch(err => (console.error(`${getDatetime()} ::: Error while timing out Cam: ${err}`)));
+            await message.reply('Yup, you\'re done. Enjoy the timeout.');
+        }
+        else {
+            await message.reply('Holy fuck bro, stfu before I time you out.');
+        }
+    }
+    else {
+        await message.reply('Holy fuck bro, stfu before I time you out.');
+    }
+    lastTimeout = Date.now();
 }
 
 function getDatetime() {
