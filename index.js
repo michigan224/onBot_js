@@ -97,6 +97,9 @@ async function getMemberMessage(member, tautulliData) {
                 if (activity.state) {
                     resp['value'] += ` (${activity.state})`;
                 }
+                else if (activity.details) {
+                    resp['value'] += ` (${activity.details})`;
+                }
             }
             else if (activity.type == 'LISTENING') {
                 active = true;
@@ -132,9 +135,12 @@ async function getMemberMessage(member, tautulliData) {
 }
 
 async function getTautulliData() {
-    const data = await tautulli.get('get_activity').then(res => {
-        return res;
-    });
+    const data = await tautulli.get('get_activity')
+        .then(res => {
+            return res;
+        }).catch(err => {
+            console.error(err);
+        });
     return data;
 }
 
