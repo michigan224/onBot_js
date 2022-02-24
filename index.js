@@ -2,7 +2,7 @@ const fs = require('fs');
 const { Client, Collection, Intents, MessageEmbed } = require('discord.js');
 const Tautulli = require('tautulli-api');
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_VOICE_STATES] });
 const tautulli = new Tautulli(process.env.TAUTULLI_IP, process.env.TAUTULLI_PORT, process.env.TAUTULLI_API_KEY);
 
 client.commands = new Collection();
@@ -47,6 +47,9 @@ client.on('messageCreate', async message => {
     if (message.author.id === '629143455871795212') {
         await handleCam(message);
     }
+    if (message.mentions.has(client.user.id)) {
+        message.channel.send('Hello there!');
+    }
 });
 
 client.on('presenceUpdate', (oldPresence, newPresence) => {
@@ -90,7 +93,7 @@ async function getMemberMessage(member, tautulliData) {
     const resp = { name: member.nickname || member.user.username, value: '', inline: false };
     let active = false;
     if (presence) {
-        for (const activity of presence.activities.sort((a, b) => (a.color < b.color) ? 1 : -1)) {
+        for (const activity of presence.activities.sort((a, b) => (a.type > b.type) ? 1 : -1)) {
             if (activity.type == 'PLAYING') {
                 active = true;
                 if (resp['value'] === '') {
@@ -119,7 +122,7 @@ async function getMemberMessage(member, tautulliData) {
     }
     const userMap = { 'Xander': 'Alex', 'Cam': 'Cam', 'Loom': 'Loom', 'Austin': 'Austin', 'David': 'michigan224', 'Chris': 'Chris' };
     if (tautulliData.response.result !== 'success') return;
-    if (tautulliData.response.data.stream_count === 0) return;
+    if (tautulliData.response.data.stream_count === '0') return;
     const data = tautulliData.response.data;
     for (const stream of data.sessions) {
         let title = '';
