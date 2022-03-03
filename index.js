@@ -52,9 +52,10 @@ client.on('messageCreate', async message => {
     }
 });
 
-client.on('presenceUpdate', (oldPresence, newPresence) => {
-    return;
-});
+// TODO: watch for presence updates for caching to respond faster.
+// client.on('presenceUpdate', (oldPresence, newPresence) => {
+//     return;
+// });
 
 client.login(process.env.DISCORD_TOKEN);
 
