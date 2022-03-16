@@ -95,6 +95,7 @@ async function getMemberMessage(member, tautulliData) {
     let active = false;
     if (presence) {
         for (const activity of presence.activities.sort((a, b) => (a.type < b.type) ? 1 : -1)) {
+            if (activity.name === 'Plex') continue;
             if (activity.type == 'PLAYING') {
                 active = true;
                 if (resp['value'] === '') {
