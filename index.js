@@ -1,9 +1,7 @@
 const fs = require('fs');
 const { Client, Collection, Intents, MessageEmbed } = require('discord.js');
-const Tautulli = require('tautulli-api');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_VOICE_STATES] });
-const tautulli = new Tautulli(process.env.TAUTULLI_IP, process.env.TAUTULLI_PORT, process.env.TAUTULLI_API_KEY);
 
 client.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -44,9 +42,7 @@ client.on('messageCreate', async message => {
         console.log(`${getDatetime()} ::: ${message.author.username} asked who's on`);
         await whosOn(message);
     }
-    if (message.author.id === '629143455871795212') {
-        await handleCam(message);
-    }
+
     if (message.mentions.has(client.user.id)) {
         message.channel.send('Hello there!');
     }
@@ -95,7 +91,6 @@ async function getMemberMessage(member, tautulliData) {
     let active = false;
     if (presence) {
         for (const activity of presence.activities.sort((a, b) => (a.type < b.type) ? 1 : -1)) {
-            if (activity.name === 'Plex') continue;
             if (activity.type == 'PLAYING') {
                 active = true;
                 if (resp['value'] === '') {
@@ -123,57 +118,8 @@ async function getMemberMessage(member, tautulliData) {
         }
     }
     if (!active) return;
-    const userMap = { 'Xander': 'Alex', 'Cam': 'Cam', 'Loom': 'Loom', 'Austin': 'Austin', 'David': 'michigan224', 'Chris': 'Chris' };
-    if (tautulliData.response.result !== 'success') return resp;
-    if (tautulliData.response.data.stream_count === '0') return resp;
-    const data = tautulliData.response.data;
-    for (const stream of data.sessions) {
-        let title = '';
-        if (userMap[resp['name']] !== stream.user) continue;
-        if (stream.library_name === 'TV Shows') {
-            title = `${stream.grandparent_title} - S${stream.parent_title.replace('Season ', '')}E${stream.media_index} - ${stream.title}`;
-        }
-        else if (stream.library_name === 'Movies') {
-            title = `${stream.title}`;
-        }
-        if (title === '') break;
-        resp['value'] += `\nWatching ${title} on Plex`;
-        active = true;
-    }
     console.log(`${getDatetime()} ::: Got status ${resp}`);
     return resp;
-}
-
-async function getTautulliData() {
-    const data = await tautulli.get('get_activity')
-        .then(res => {
-            return res;
-        }).catch(err => {
-            console.error(err);
-        });
-    return data;
-}
-
-async function handleCam(message) {
-    const words = message.cleanContent.toLowerCase().match(/\w+(?:'\w+)*/g);
-    if (!words.includes('sad')) return;
-    if (lastTimeout) {
-        const guildMember = message.member;
-        const seconds = Math.abs(lastTimeout - Date.now()) / 1000;
-        if (seconds < 1 * 60) {
-            guildMember.timeout(1 * 60 * 1000, 'Spamming chat')
-                .then(console.log(`${getDatetime()} ::: Timed out Cam for ${1 * 60 * 1000} seconds`))
-                .catch(err => (console.error(`${getDatetime()} ::: Error while timing out Cam: ${err}`)));
-            await message.reply('Yup, you\'re done. Enjoy the timeout.');
-        }
-        else {
-            await message.reply('Holy fuck bro, stfu before I time you out.');
-        }
-    }
-    else {
-        await message.reply('Holy fuck bro, stfu before I time you out.');
-    }
-    lastTimeout = Date.now();
 }
 
 function getDatetime() {
