@@ -169,11 +169,11 @@ async function handleCam(message) {
             await message.reply('Yup, you\'re done. Enjoy the timeout.');
         }
         else {
-            await message.reply('Holy fuck bro, stfu before I time you out.');
+            await message.reply('Pipe down before I time you out.');
         }
     }
     else {
-        await message.reply('Holy fuck bro, stfu before I time you out.');
+        await message.reply('Pipe down before I time you out.');
     }
     lastTimeout = Date.now();
 }
