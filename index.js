@@ -124,6 +124,7 @@ async function getMemberMessage(member, tautulliData) {
     }
     if (!active) return;
     const userMap = { 'Xander': 'Alex', 'Cam': 'Cam', 'Loom': 'Loom', 'Austin': 'Austin', 'David': 'michigan224', 'Chris': 'Chris' };
+    if (!(resp['name'] in userMap)) return resp;
     if (tautulliData.response.result !== 'success') return resp;
     if (tautulliData.response.data.stream_count === '0') return resp;
     const data = tautulliData.response.data;
@@ -156,6 +157,7 @@ async function getTautulliData() {
 
 async function handleCam(message) {
     const words = message.cleanContent.toLowerCase().match(/\w+(?:'\w+)*/g);
+    if (!words) return;
     if (!words.includes('sad')) return;
     if (lastTimeout) {
         const guildMember = message.member;
