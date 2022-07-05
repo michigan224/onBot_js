@@ -125,7 +125,7 @@ async function getMemberMessage(member, tautulliData) {
     if (!active) return;
     const userMap = { 'Xander': 'Alex', 'Cam': 'Cam', 'Loom': 'Loom', 'Austin': 'Austin', 'David': 'michigan224', 'Chris': 'Chris' };
     if (!(resp['name'] in userMap)) return resp;
-    if (tautulliData.response.result !== 'success') return resp;
+    if (!tautulliData || tautulliData.response.result !== 'success') return resp;
     if (tautulliData.response.data.stream_count === '0') return resp;
     const data = tautulliData.response.data;
     for (const stream of data.sessions) {
