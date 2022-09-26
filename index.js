@@ -64,10 +64,11 @@ async function whosOn(message) {
     const embed = new MessageEmbed()
         .setColor('#0099ff')
         .setTitle('Who\'s on?');
+
     let alone = true;
     const tautulliData = await getTautulliData();
     for (const member of members.values()) {
-        if (member.user.bot || member.user == message.author) continue;
+        // if (member.user.bot || member.user == message.author) continue;
         console.log(`${getDatetime()} ::: Getting status of ${member.user.username}`);
         const resp = await getMemberMessage(member, tautulliData);
         if (resp) {
@@ -114,7 +115,7 @@ async function getMemberMessage(member, tautulliData) {
             else if (activity.type == 'LISTENING') {
                 active = true;
                 if (resp['value'] === '') {
-                    resp['value'] += `Listening to ${activity.details}`;
+                    resp['value'] += `Listening to [${activity.details}](https://open.spotify.com/track/${activity.syncId})`;
                 }
                 else {
                     resp['value'] += ` while listening to ${activity.details}`;
