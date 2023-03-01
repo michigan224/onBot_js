@@ -16,6 +16,12 @@ const tautulli = new Tautulli(
     process.env.TAUTULLI_PORT,
     process.env.TAUTULLI_API_KEY
 );
+const LogLevel = {
+    Info: "info",
+    Warning: "warning",
+    Error: "error",
+    Debug: "debug",
+}
 
 client.commands = new Collection();
 const commandFiles = fs
@@ -30,7 +36,7 @@ for (const file of commandFiles) {
 }
 
 client.once('ready', (c) => {
-    console.log(`${getDatetime()} ::: Ready! Logged in as ${c.user.tag}`);
+    log(`Ready! Logged in as ${c.user.tag}`, LogLevel.Info);
     client.user.setActivity('you monkey brains', { type: 'LISTENING' });
 });
 
@@ -44,7 +50,7 @@ client.on('interactionCreate', async (interaction) => {
     try {
         await command.execute(interaction);
     } catch (error) {
-        console.error(error);
+        log(error, LogLevel.Error);
         await interaction.reply({
             content: 'There was an error while executing this command!',
             ephemeral: true,
@@ -54,19 +60,10 @@ client.on('interactionCreate', async (interaction) => {
 
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
-    console.log(
-        `${getDatetime()} ::: ${message.author.username
-        } said ${message.cleanContent.toLowerCase()}`
-    );
+    log(`${message.author.username} said ${message.cleanContent.toLowerCase()}`, LogLevel.Debug);
     const words = message.cleanContent.toLowerCase().match(/\w+(?:'\w+)*/g);
-    if (
-        words &&
-        (words.includes('who') ||
-            words.includes('whos') ||
-            words.includes("who's")) &&
-        words.includes('on')
-    ) {
-        console.log(
+    if (isAskingWhosOn(words)) {
+        log(
             `${getDatetime()} ::: ${message.author.username} asked who's on`
         );
         await whosOn(message);
@@ -83,13 +80,13 @@ client.login(process.env.DISCORD_TOKEN);
 
 async function whosOn(message) {
     const members = message.channel.members;
-    const embed = new MessageEmbed().setColor('#0099ff').setTitle("Who's on?");
+    const embed = new MessageEmbed().setColor('#0099FF').setTitle("Who's on?");
 
     let alone = true;
     const tautulliData = await getTautulliData();
     for (const member of members.values()) {
         if (member.user.bot || member.user == message.author) continue;
-        console.log(
+        log(
             `${getDatetime()} ::: Getting status of ${member.user.username}`
         );
         const resp = await getMemberMessage(member, tautulliData);
@@ -105,14 +102,14 @@ async function whosOn(message) {
             false
         );
     }
-    console.log(`${getDatetime()} ::: Sending reply message`);
+    log(`${getDatetime()} ::: Sending reply message`, LogLevel.Debug);
     await message
         .reply({ embeds: [embed] })
         .then(() => {
-            console.log(`${getDatetime()} ::: Reply sent`);
+            log(`${getDatetime()} ::: Reply sent`, LogLevel.Debug);
         })
         .catch((err) => {
-            console.log(`${getDatetime()} ::: Error sending reply: ${err}`);
+            log(`${getDatetime()} ::: Error sending reply: ${err}`, LogLevel.Error);
         });
     return;
 }
@@ -183,7 +180,7 @@ async function getMemberMessage(member, tautulliData) {
         resp['value'] += `\nWatching ${title} on Plex`;
         active = true;
     }
-    console.log(`${getDatetime()} ::: Got status ${resp}`);
+    log(`${getDatetime()} ::: Got status ${resp}`, LogLevel.Debug);
     return resp;
 }
 
@@ -194,7 +191,7 @@ async function getTautulliData() {
             return res;
         })
         .catch((err) => {
-            console.error(err);
+            log(err, LogLevel.Error);
         });
     return data;
 }
@@ -210,13 +207,14 @@ async function handleCam(message) {
             guildMember
                 .timeout(1 * 60 * 1000, 'Spamming chat')
                 .then(
-                    console.log(
-                        `${getDatetime()} ::: Timed out Cam for ${1 * 60 * 1000} seconds`
+                    log(
+                        `${getDatetime()} ::: Timed out Cam for ${1 * 60 * 1000} seconds`, LogLevel.Debug
                     )
                 )
                 .catch((err) =>
-                    console.error(
-                        `${getDatetime()} ::: Error while timing out Cam: ${err}`
+                    log(
+                        `${getDatetime()} ::: Error while timing out Cam: ${err}`,
+                        LogLevel.Error
                     )
                 );
             await message.reply("Yup, you're done. Enjoy the timeout.");
@@ -229,12 +227,37 @@ async function handleCam(message) {
     lastTimeout = Date.now();
 }
 
+function isAskingWhosOn(words) {
+    return (words &&
+        (words.includes('who') ||
+            words.includes('whos') ||
+            words.includes("who's")) &&
+        words.includes('on'));
+}
+
 function getDatetime() {
     const today = new Date();
     const date =
         today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     const time =
         today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-    const dateTime = date + ' ' + time;
+    const dateTime = date + 'T' + time;
     return dateTime;
+}
+
+function log(message, level = 'info') {
+    switch (level) {
+        case LogLevel.Info:
+            console.log(`${getDatetime()} | ${message}`);
+            break;
+        case LogLevel.Warn:
+            console.warn(`${getDatetime()} | ${message}`);
+            break;
+        case LogLevel.Error:
+            console.error(`${getDatetime()} | ${message}`);
+            break;
+        case LogLevel.Debug:
+            console.debug(`${getDatetime()} | ${message}`);
+            break;
+    }
 }
