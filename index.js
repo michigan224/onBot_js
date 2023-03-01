@@ -17,11 +17,11 @@ const tautulli = new Tautulli(
     process.env.TAUTULLI_API_KEY
 );
 const LogLevel = {
-    Info: "info",
-    Warning: "warning",
-    Error: "error",
-    Debug: "debug",
-}
+    Info: 'info',
+    Warning: 'warning',
+    Error: 'error',
+    Debug: 'debug',
+};
 
 client.commands = new Collection();
 const commandFiles = fs
@@ -60,12 +60,13 @@ client.on('interactionCreate', async (interaction) => {
 
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
-    log(`${message.author.username} said ${message.cleanContent.toLowerCase()}`, LogLevel.Debug);
+    log(
+        `${message.author.username} said ${message.cleanContent.toLowerCase()}`,
+        LogLevel.Debug
+    );
     const words = message.cleanContent.toLowerCase().match(/\w+(?:'\w+)*/g);
     if (isAskingWhosOn(words)) {
-        log(
-            `${getDatetime()} ::: ${message.author.username} asked who's on`
-        );
+        log(`${getDatetime()} ::: ${message.author.username} asked who's on`);
         await whosOn(message);
     }
     if (message.author.id === '629143455871795212') {
@@ -86,9 +87,7 @@ async function whosOn(message) {
     const tautulliData = await getTautulliData();
     for (const member of members.values()) {
         if (member.user.bot || member.user == message.author) continue;
-        log(
-            `${getDatetime()} ::: Getting status of ${member.user.username}`
-        );
+        log(`${getDatetime()} ::: Getting status of ${member.user.username}`);
         const resp = await getMemberMessage(member, tautulliData);
         if (resp) {
             alone = false;
@@ -208,7 +207,8 @@ async function handleCam(message) {
                 .timeout(1 * 60 * 1000, 'Spamming chat')
                 .then(
                     log(
-                        `${getDatetime()} ::: Timed out Cam for ${1 * 60 * 1000} seconds`, LogLevel.Debug
+                        `${getDatetime()} ::: Timed out Cam for ${1 * 60 * 1000} seconds`,
+                        LogLevel.Debug
                     )
                 )
                 .catch((err) =>
@@ -228,11 +228,13 @@ async function handleCam(message) {
 }
 
 function isAskingWhosOn(words) {
-    return (words &&
+    return (
+        words &&
         (words.includes('who') ||
             words.includes('whos') ||
             words.includes("who's")) &&
-        words.includes('on'));
+        words.includes('on')
+    );
 }
 
 function getDatetime() {
