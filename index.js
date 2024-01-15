@@ -117,7 +117,7 @@ async function getMemberMessage(member, tautulliData) {
     const presence = member.presence;
     if (presence && presence.status == 'offline') return;
     const resp = {
-        name: member.user.username,
+        name: getMemberName(member.user.username),
         value: '',
         inline: false,
     };
@@ -153,12 +153,12 @@ async function getMemberMessage(member, tautulliData) {
     }
     if (!active) return;
     const userMap = {
-        'xander_lmao': 'Alex',
-        'djloom': 'Loom',
-        'a_tothej': 'Austin',
-        'michigan224': 'David',
-        'truhshy': 'Chris',
-        'joe_borthwick08': 'Joe'
+        Alex: 'Alex',
+        Cam: 'Cam',
+        Loom: 'Loom',
+        Austin: 'Austin',
+        David: 'michigan224',
+        Chris: 'Chris',
     };
     if (!(resp['name'] in userMap)) return resp;
     if (!tautulliData || tautulliData.response.result !== 'success') return resp;
@@ -181,6 +181,21 @@ async function getMemberMessage(member, tautulliData) {
     }
     log(`${getDatetime()} ::: Got status ${resp}`, LogLevel.Debug);
     return resp;
+}
+
+function getMemberName(username) {
+    const userMap = {
+        'xander_lmao': 'Alex',
+        'djloom': 'Loom',
+        'a_tothej': 'Austin',
+        'michigan224': 'David',
+        'truhshy': 'Chris',
+        'joe_borthwick08': 'Joe'
+    };
+    if (username in userMap) {
+        return userMap[username];
+    }
+    return username;
 }
 
 async function getTautulliData() {
