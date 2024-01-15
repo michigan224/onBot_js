@@ -190,7 +190,8 @@ function getMemberName(username) {
         'a_tothej': 'Austin',
         'michigan224': 'David',
         'truhshy': 'Chris',
-        'joe_borthwick08': 'Joe'
+        'joe_borthwick08': 'Joe',
+        'cameronthedestroyer69': 'Cam'
     };
     if (username in userMap) {
         return userMap[username];
