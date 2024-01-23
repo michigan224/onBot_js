@@ -103,7 +103,7 @@ async function whosOn(message) {
     }
     log(`${getDatetime()} ::: Sending reply message`, LogLevel.Debug);
     await message
-        .reply({ embeds: [embed] })
+        .reply({ embeds: [embed], ephemeral: true })
         .then(() => {
             log(`${getDatetime()} ::: Reply sent`, LogLevel.Debug);
         })
