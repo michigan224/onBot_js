@@ -17,19 +17,9 @@ function getDatetime() {
 
 module.exports = {
     log: function log(message, level = 'info') {
-        switch (level) {
-            case LogLevel.Info:
-                console.log(`${getDatetime()} | ${message}`);
-                break;
-            case LogLevel.Warn:
-                console.warn(`${getDatetime()} | ${message}`);
-                break;
-            case LogLevel.Error:
-                console.error(`${getDatetime()} | ${message}`);
-                break;
-            case LogLevel.Debug:
-                console.debug(`${getDatetime()} | ${message}`);
-                break;
+        const logMethod = console[level];
+        if (logMethod) {
+            logMethod(`${getDatetime()} | ${message}`);
         }
     },
     LogLevel: LogLevel,
