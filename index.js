@@ -1,6 +1,8 @@
 const fs = require('fs');
 const { Client, Collection, Intents, MessageEmbed } = require('discord.js');
 const Tautulli = require('tautulli-api');
+require('dotenv').config();
+const { log, LogLevel, getDatetime } = require('./logging');
 
 const client = new Client({
     intents: [
@@ -16,12 +18,6 @@ const tautulli = new Tautulli(
     process.env.TAUTULLI_PORT,
     process.env.TAUTULLI_API_KEY
 );
-const LogLevel = {
-    Info: 'info',
-    Warning: 'warning',
-    Error: 'error',
-    Debug: 'debug',
-};
 
 client.commands = new Collection();
 const commandFiles = fs
@@ -251,31 +247,4 @@ function isAskingWhosOn(words) {
             words.includes("who's")) &&
         words.includes('on')
     );
-}
-
-function getDatetime() {
-    const today = new Date();
-    const date =
-        today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    const time =
-        today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-    const dateTime = date + 'T' + time;
-    return dateTime;
-}
-
-function log(message, level = 'info') {
-    switch (level) {
-        case LogLevel.Info:
-            console.log(`${getDatetime()} | ${message}`);
-            break;
-        case LogLevel.Warn:
-            console.warn(`${getDatetime()} | ${message}`);
-            break;
-        case LogLevel.Error:
-            console.error(`${getDatetime()} | ${message}`);
-            break;
-        case LogLevel.Debug:
-            console.debug(`${getDatetime()} | ${message}`);
-            break;
-    }
 }
