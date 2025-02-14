@@ -6,13 +6,9 @@ const LogLevel = {
 };
 
 function getDatetime() {
+    // Example output: 2024-01-23T14:35:27
     const today = new Date();
-    const date =
-        today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    const time =
-        today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-    const dateTime = date + 'T' + time;
-    return dateTime;
+    return today.toISOString().slice(0, 19).replace('Z', '');
 }
 
 module.exports = {
